@@ -1,6 +1,5 @@
 'use strict';
 let Helper = require('../helpers/common.helper');
-let User = require('../models/user.model');
 const jwt = require('jsonwebtoken');
 
 /**
@@ -16,14 +15,14 @@ module.exports = {
    * Get Token from Request Header
    */
   getAccessToken: (req) => {
-    return getAccessTokenFromHeader(req) || getAccessTokenFromUrl(req);
+    return getAccessTokenFromHeader(req);
   },
 
   /*
   * Get UserData from JWT token.
   */
   getUserData: async (req, res, next) => {
-    let tokenfromheader = getAccessTokenFromHeader(req) || getAccessTokenFromUrl(req);
+    let tokenfromheader = getAccessTokenFromHeader(req);
     return jwt.verify(tokenfromheader, process.env.JWT_KEY);
   },
 
@@ -31,18 +30,16 @@ module.exports = {
    * Check token is validate or not.
    */
   ensure: async (req, res, next) => {
-    let tokenfromheader = getAccessTokenFromHeader(req) || getAccessTokenFromUrl(req);
+    let tokenfromheader = getAccessTokenFromHeader(req);
     if (tokenfromheader === null) {
       Helper.handleError(res, 401, 'UnAthorize access.', false, {})
     } else {
-      let userData = await User.findOne({
-        token: tokenfromheader,
-      });
-      if (userData) {
+      let userData = "";
+      // if (userData) {
         next();
-      } else {
-        Helper.handleError(res, 401, 'UnAthorize access.', false, {})
-      }
+      // } else {
+        // Helper.handleError(res, 401, 'UnAthorize access.', false, {})
+      // }
     }
   }
 
