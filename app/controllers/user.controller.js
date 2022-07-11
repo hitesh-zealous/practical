@@ -32,17 +32,18 @@ module.exports = {
         return;
       }
 
+      // console.log({gg:req.body});
+//  return false;
       let email = req.body.email;
       let password = bcrypt.hashSync(req.body.password, 10);
       let role = req.body.role;
 
-      var sql = `SELECT * FROM users WHERE email = '${email}'`;
-      connection.query(sql,function (err, result, fields) {
-        if (err) throw err;
-        if(result && result.length > 0){
-          Helper.handleError(res, 200, "Email already exits.");
-        }
-      });
+      let userData = await _createUser(req.body);
+      if(!userData){
+        Helper.handleError(res, 200, "Email already exits.");
+        return;
+      }
+
 
       var sqlinsert = "INSERT INTO users (email, password, role) VALUES ?";
       var valuesinsert = [
@@ -62,4 +63,18 @@ module.exports = {
       return;
     }
   },
+}
+
+
+async function _createUser(data){
+  var sql = `SELECT * FROM users WHERE email = '${data.email}'`;
+  connection.query(sql,function (err, result, fields) {
+    if (err) throw err;
+    if(result && result.length > 0){
+      return false;
+    }else{
+      return true;
+    }
+  });
+  
 }

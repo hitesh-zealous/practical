@@ -8,7 +8,7 @@ let bodyParser = require('body-parser');
 let expressValidator = require('express-validator');
 // let mongoose = require('mongoose');
 
-let Promise = require('bluebird');
+// let Promise = require('bluebird');
 let compression = require('compression');
 // mongoose.Promise = Promise;
 // mongoose.connect(process.env.DATABASE_URI);
