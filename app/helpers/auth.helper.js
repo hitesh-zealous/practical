@@ -2,6 +2,8 @@
 let Helper = require('../helpers/common.helper');
 const jwt = require('jsonwebtoken');
 
+let libUser = require('../lib/lib.user');  
+
 /**
  * Get authorization token from header
  */
@@ -34,12 +36,12 @@ module.exports = {
     if (tokenfromheader === null) {
       Helper.handleError(res, 401, 'UnAthorize access.', false, {})
     } else {
-      let userData = "";
-      // if (userData) {
+      var userData = await libUser.getUserToken(tokenfromheader);
+      if (userData) {
         next();
-      // } else {
-        // Helper.handleError(res, 401, 'UnAthorize access.', false, {})
-      // }
+      } else {
+        Helper.handleError(res, 401, 'UnAthorize access.', false, {})
+      }
     }
   }
 

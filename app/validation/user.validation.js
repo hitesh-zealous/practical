@@ -1,6 +1,6 @@
 'use strict';
 
-const { body } = require('express-validator/check')
+const { body, param } = require('express-validator/check')
 
 exports.validate = (method) => {
   switch (method) {
@@ -10,6 +10,25 @@ exports.validate = (method) => {
         body('email', 'Invalid email').isEmail().normalizeEmail(),
         body('password').isLength({ min: 3 }, { max: 25 }).trim().escape().withMessage('Min 3 and Max 25 char required.'),
         body('role').isIn(['admin', 'user']).withMessage('Only admin & user role accepted.'),
+      ]
+    }
+
+    case 'userDetail': {
+      return [
+        param('id').trim().escape(),
+      ]
+    }
+
+    case 'updateUser': {
+      return [
+        param('id').trim().escape(),
+        body('email', 'Invalid email').isEmail().normalizeEmail(),
+      ]
+    }
+
+    case 'deleteUser': {
+      return [
+        param('id').trim().escape(),
       ]
     }
 
