@@ -4,9 +4,14 @@ const bcrypt  = require('bcrypt');
 var connection  = require('./db');
 
 module.exports = {
-  list: async () => {
+  list: async (withfilter="") => {
     return new Promise((resolve, reject) => {
-      connection.query( `SELECT * FROM users ORDER BY id desc`, (err, results) => {
+
+      var sql = "SELECT * FROM users ORDER BY id desc";
+      if(withfilter != ""){
+        sql = `SELECT * FROM users ORDER BY ${withfilter}`;
+      }
+      connection.query( sql, (err, results) => {
         if(err) {
             reject(err);
         } else {
@@ -51,10 +56,10 @@ module.exports = {
 
   createUser: async (allParam) => {
     return new Promise((resolve, reject) => {
-      let { email, password, role } = allParam;
+      let { email, password, role, name, contact } = allParam;
       password = bcrypt.hashSync(password, 10);
 
-      var valuesinsert = { email, password, role };
+      var valuesinsert = { email, password, role, name, contact };
       connection.query(`INSERT INTO users SET ?`, valuesinsert, (err, results) => {
           if(err) {
             reject(err);
@@ -91,8 +96,8 @@ module.exports = {
 
   updateUser: async (id,allParam) => {
     return new Promise((resolve, reject) => {
-      let { email } = allParam;
-      var valuesinsert = { email };
+      let { email, name, contact } = allParam;
+      var valuesinsert = { email, name, contact };
       connection.query(`UPDATE users SET ? WHERE id = ?`, [valuesinsert,id], (err, results) => {
           if(err) {
             reject(err);

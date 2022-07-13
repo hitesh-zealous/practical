@@ -10,7 +10,6 @@ let libUser = require('../lib/lib.user');
 async function isImage(files){
   if (files !== null) {
     let extension = files.originalname.split('.').pop();
-    console.log(extension);
     switch (extension) {
         case 'jpg':
             return true;
@@ -82,14 +81,28 @@ module.exports = {
    */
    list: async (req, res) => {
     try {
-      let getAll = await libUser.list();
+      var withfilter = "";
+      var {sort_by ,page ,limit } = req.query;
+      if(sort_by != undefined && sort_by != ""){ withfilter = sort_by.replace(".", " "); }
+      if(page != undefined && page != ""){ 
+        limit = limit ? limit : 1; 
+        var offset = limit * page; 
+        var makepage = " LIMIT "+limit+" OFFSET "+offset; 
+        withfilter = withfilter+makepage;
+      }
+
+      let getAll = await libUser.list(withfilter);
       if(getAll && getAll.length >0){
         Helper.respondAsJSON(res, "User list successfully.", getAll, true, 200);
       }else{
         Helper.respondAsJSON(res, "User list empty.", getAll, true, 200);
       }
     } catch (Error) {
-      Helper.handleError(res);
+      if(Error && Error.errno && Error.errno == "1054"){
+        Helper.handleError(res,500,"Column not found");
+      }else{
+        Helper.handleError(res);
+      }
       return;
     }
   },
@@ -119,23 +132,25 @@ module.exports = {
       }
       
 
-      let uploadPath= process.env.APP_ROOT+"public/data/uploads/"+file.originalname;
-      
-      file.mv(uploadPath, function(err) {
-        if (err){
-          Helper.handleError(res,500, "file not uploded");
-          return;
+      var storage = multer.diskStorage({
+        destination: function (req, file, cb) {
+          cb(null, './uploads')
+        },
+        filename: function (req, file, cb) {
+          cb(null, file.originalname)
         }
-        
+      })
+      var upload = multer({ storage: storage });
+      if(upload){
         var dbfilename = '/public/data/uploads/'+file.filename;
         //update user profile
         let updateUser = libUser.updateProfile(userData[0].id,dbfilename);
         if(updateUser){
-          var returnData = libUser.getUserById(updateUser.insertId);
-          Helper.respondAsJSON(res, "User profile updated successfully.", returnData, true, 200);
+          userData[0].image = dbfilename;
+          Helper.respondAsJSON(res, "User profile updated successfully.", userData, true, 200);
           return;
         }
-      });
+      }
 
     } catch (Error) {
       console.log(">",Error);
