@@ -90,14 +90,15 @@ module.exports = {
         var makepage = " LIMIT "+limit+" OFFSET "+offset; 
         withfilter = withfilter+makepage;
       }
-
       let getAll = await libUser.list(withfilter);
+      console.log(">>>>",getAll);
       if(getAll && getAll.length >0){
         Helper.respondAsJSON(res, "User list successfully.", getAll, true, 200);
       }else{
         Helper.respondAsJSON(res, "User list empty.", getAll, true, 200);
       }
     } catch (Error) {
+      console.log("<>>>>>",Error);
       if(Error && Error.errno && Error.errno == "1054"){
         Helper.handleError(res,500,"Column not found");
       }else{

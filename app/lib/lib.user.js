@@ -2,23 +2,33 @@
 
 const bcrypt  = require('bcrypt');
 var connection  = require('./db');
+let Helper = require('../helpers/common.helper');
+
+
 
 module.exports = {
-  list: async (withfilter="") => {
-    return new Promise((resolve, reject) => {
+  list: async (withfilter="", res) => {
+  
 
       var sql = "SELECT * FROM users ORDER BY id desc";
       if(withfilter != ""){
         sql = `SELECT * FROM users ORDER BY ${withfilter}`;
       }
-      connection.query( sql, (err, results) => {
-        if(err) {
-            reject(err);
-        } else {
-            resolve(results);
-        } 
-      });
-    });
+      
+      // let data = 'abc';
+      // const value = connection.query( sql, function (err, results) {
+      //   // return results;
+      //   console.log(results);
+      //   // data = results;
+      //   return results;
+      //   // return results;
+      // });      
+      // console.log("value: ",JSON.parse(JSON.stringify(value)));
+      const data = await connection.promise().query(sql);
+      return data[0];
+      // console.log("Data: ", data);
+      // return data;
+
   },
 
   checkExists: async (email) => {
