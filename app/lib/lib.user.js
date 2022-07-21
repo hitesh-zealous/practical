@@ -14,21 +14,18 @@ module.exports = {
       if(withfilter != ""){
         sql = `SELECT * FROM users ORDER BY ${withfilter}`;
       }
-      
-      // let data = 'abc';
-      // const value = connection.query( sql, function (err, results) {
-      //   // return results;
-      //   console.log(results);
-      //   // data = results;
-      //   return results;
-      //   // return results;
-      // });      
-      // console.log("value: ",JSON.parse(JSON.stringify(value)));
-      const data = await connection.promise().query(sql);
-      return data[0];
-      // console.log("Data: ", data);
+     
+      // const data = await connection.promise().query(sql);
+      // console.log({data});
       // return data;
 
+      const data = await connection.promise().query(sql,function (err, rows, fields) {
+        if (err) throw err;
+
+            console.log(rows);           
+            
+        
+    });
   },
 
   checkExists: async (email) => {
