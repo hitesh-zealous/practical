@@ -15,9 +15,9 @@ module.exports = {
         sql = `SELECT * FROM users ORDER BY ${withfilter}`;
       }
      
-      const data = await connection.promise().query(sql);
-      console.log({data});
-      return data[0];
+      const [rows, fields] = await connection.promise().query(sql);
+      console.log({rows});
+      return rows;
 
     //  var data = await connection.promise().query(sql,function (err, rows, fields) {
     //     if (err) throw err;
